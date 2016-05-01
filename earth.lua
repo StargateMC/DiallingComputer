@@ -1101,7 +1101,9 @@ while running do
               symbol = characters[key-96]
             end
             if type then
-              gpu.set(11+index, 10, symbol)
+              if symbol ~= null then
+                gpu.set(11+index, 10, symbol)
+              end
             end
             if index==4 then
               index = index + 1
