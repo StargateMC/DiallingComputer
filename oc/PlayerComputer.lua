@@ -1138,7 +1138,7 @@ function addressBook()
       --numLines = numLines + 1
       --print(iter..tablelength(locations))
       
-      if (sg.getAddressForLocation(locations[iter]) ~= "None") then
+      if (locations[iter] ~= "None") then
         index = index + 1
         gpu.setBackground(0x339D8F)
         gpu.fill(4, 3+index*7, w-10, 1, " ")
