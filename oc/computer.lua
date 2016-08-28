@@ -686,7 +686,7 @@ function addressBook(override)
   local addresses = {}
   --local numLines = 0
   
-  for location in string.gmatch(sg.getLocations(), '([^,]+)') do
+  for location in string.gmatch(sg.getGateNetwork(), '([^,]+)') do
       table.insert(locations, location)
   end
   
@@ -699,7 +699,7 @@ function addressBook(override)
       --numLines = numLines + 1
       --print(iter..tablelength(locations))
       
-      if (sg.getAddressForLocation(locations[iter]) ~= "None") then
+      if (locations[iter] ~= "None") then
         index = index + 1
         gpu.setBackground(0x339D8F)
         gpu.fill(4, 3+index*7, w-10, 1, " ")
@@ -729,12 +729,12 @@ function addressBook(override)
         gpu.set(145, 6+index*7, " DIAL ")
       
         local coords = "COORDS"
-        local atmosphere = "ATMOSPHERE"
-        local galaxy = "GALAXY"
+        local atmosphere = sg.getAtmosphereAtStargate(locations[iter])
+        local galaxy = sg.getGalaxyAtStargate(locations[iter])
         local address = locations[iter]
         
         gpu.set(110, 4+index*7, "# "..index+((currentPage-1)*5))
-        gpu.set(120, 4+index*7, locations[iter])
+        gpu.set(120, 4+index*7, sg.getLocationAtStargate(locations[iter]))
         gpu.set(110, 5+index*7, "Additional symbols: ")
         gpu.set(110, 6+index*7, "Atmosphere: "..atmosphere)
         gpu.set(110, 7+index*7, "Galaxy: "..galaxy)
