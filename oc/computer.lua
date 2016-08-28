@@ -728,10 +728,10 @@ function addressBook(override)
         gpu.setForeground(0xFFFFFF)
         gpu.set(145, 6+index*7, " DIAL ")
       
-        local coords = sg.getCoordinatesForLocation(locations[iter])
-        local atmosphere = sg.getAtmosphereForLocation(locations[iter])
-        local galaxy = sg.getGalaxyNameForLocation(locations[iter])
-        local address = sg.getAddressForLocation(locations[iter])
+        local coords = "COORDS"
+        local atmosphere = "ATMOSPHERE"
+        local galaxy = "GALAXY"
+        local address = locations[iter]
         
         gpu.set(110, 4+index*7, "# "..index+((currentPage-1)*5))
         gpu.set(120, 4+index*7, locations[iter])
