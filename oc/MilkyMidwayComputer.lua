@@ -1,6 +1,5 @@
 local component = require("component")
 local sg = component.stargate
-local holo = component.hologram
 local gpu = component.gpu
 local keyboard = require("keyboard")
 local w, h = gpu.getResolution()
@@ -435,15 +434,9 @@ function drawGateControls(colorControls)
 end
 
 function drawButtons()
-  --exit
-  gpu.setBackground(0xCC0000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(w-5, 1, 5, 1, " ")
-  gpu.set(w-3, 1, "X")
-  
   --iris
   gpu.setBackground(0x339D8F)
-  gpu.setForeground(0xFFFFFF)
+  gpu.setForeground(0x444444)
   gpu.fill(4, 3, 8, 3, " ")
   gpu.fill(12, 3, 20, 3, " ")
   gpu.setBackground(0x000000)
@@ -455,6 +448,7 @@ function drawButtons()
   gpu.setBackground(0x339D8F)
   gpu.fill(4, 7, 28, 5, " ")
   gpu.setBackground(0x000000)
+  gpu.setForeground(0xFFFFFF)
   gpu.fill(5, 8, 26, 1, " ")
   gpu.fill(5, 10, 26, 1, " ")
   gpu.set(11, 8, "DIAL DIRECTLY")
@@ -462,12 +456,14 @@ function drawButtons()
   gpu.setBackground(0xCC0000)
   gpu.fill(4, 13, 28, 3, " ")
   gpu.setBackground(0x000000)
+  gpu.setForeground(0x444444)
   gpu.fill(5, 14, 26, 1, " ")
   gpu.set(8, 14, "TERMINATE CONNECTION")
   --energy
   gpu.setBackground(0x339D8F)
   gpu.fill(4, 17, 28, 9, " ")
   gpu.setBackground(0x000000)
+  gpu.setForeground(0xFFFFFF)
   gpu.fill(5, 18, 26, 1, " ")
   gpu.fill(5, 20, 26, 1, " ")
   gpu.fill(5, 22, 26, 3, " ")
@@ -476,12 +472,14 @@ function drawButtons()
   gpu.setBackground(0x339D8F)
   gpu.fill(4, 27, 28, 3, " ")
   gpu.setBackground(0x000000)
+  gpu.setForeground(0xFFFFFF)
   gpu.fill(5, 28, 26, 1, " ")
   gpu.set(11, 28, "ADDRESS BOOK")
   --settings
   gpu.setBackground(0x339D8F)
   gpu.fill(4, 31, 28, 3, " ")
   gpu.setBackground(0x000000)
+  gpu.setForeground(0x444444)
   gpu.fill(5, 32, 26, 1, " ")
   gpu.set(13, 32, "SETTINGS")
   --msg window
@@ -497,8 +495,17 @@ function drawBorders()
   gpu.fill(1, 1, 1, h-2, " ")
   gpu.fill(1, h, w, h, " ")
   gpu.fill(w, 3, w-1, h, " ")
+end
+
+function drawAddressBookBorders()
+  gpu.setBackground(0x339D8F)
+  gpu.fill(1, 1, w, 1, " ")
+  gpu.fill(1, 1, 1, h-2, " ")
+  gpu.fill(1, h, w, h, " ")
+  gpu.fill(w, 3, w-1, h, " ")
   
   gpu.setBackground(0xCC0000)
+  gpu.setForeground(0xFFFFFF)
   gpu.fill(w-5, 1, 5, 1, " ")
   gpu.set(w-3, 1, "X")
 end
@@ -519,7 +526,7 @@ function resetGUI()
   gpu.fill(41, 41, 78, 1, " ")
   gpu.fill(41, 47, 78, 1, " ")
 end
-
+--[[
 function textField(x, y, lenx, leny)
    local typing = true
    local type = true
@@ -592,7 +599,7 @@ function textField(x, y, lenx, leny)
   end
   return text
 end
-
+]]
 function removeLines(filename, startingLine, numLines)
     local fp = io.open(filename, "r")
     if fp == nil then return nil end
@@ -640,453 +647,7 @@ function tablelength(T)
   return count
 end
 
---[[
-function addressBookDetail(mode, lineNumber)
-  gpu.setBackground(0x000000)
-  gpu.fill(1, 1, w, h, " ")
-  gpu.setBackground(0x339D8F)
-  drawBorders()
-  
-  addressBookDetRunning = true
-  
-  --address
-  gpu.setBackground(0x339D8F)
-  gpu.fill(4, 3, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(16, 4, 17, 1, " ")
-  gpu.set(5, 4, " ADDRESS: ")
-  --number
-  gpu.setBackground(0x339D8F)
-  gpu.fill(35, 3, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(46, 4, 18, 1, " ")
-  gpu.set(36, 4, " NUMBER: ")
-  --code
-  gpu.setBackground(0x339D8F)
-  gpu.fill(66, 3, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(77, 4, 18, 1, " ")
-  gpu.set(67, 4, "  CODE:  ")
-  --name
-  gpu.setBackground(0x339D8F)
-  gpu.fill(97, 3, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(108, 4, 18, 1, " ")
-  gpu.set(98, 4, "  NAME:  ")
-  --category
-  gpu.setBackground(0x339D8F)
-  gpu.fill(128, 3, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(139, 4, 18, 1, " ")
-  gpu.set(129, 4, "CATEGORY:")
-  --galaxy
-  gpu.setBackground(0x339D8F)
-  gpu.fill(4, 7, 30, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(16, 8, 17, 1, " ")
-  gpu.set(5, 8, "  GALAXY: ")
-  --description
-  gpu.setBackground(0x339D8F)
-  gpu.fill(35, 7, 123, 3, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(51, 8, 106, 1, " ")
-  gpu.set(36, 8, " DESCRIPTION: ")
-  --info
-  gpu.setBackground(0x339D8F)
-  gpu.fill(4, 11, 12, 3, " ")
-  gpu.fill(4, 13, 154, 32, " ")
-  gpu.setBackground(0x000000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(5, 14, 152, 30, " ")
-  gpu.set(5, 12, "  INFO:   ")
-  
-  if mode ~= "m" then
-    --save changes locally
-    gpu.setBackground(0x339D8F)
-    gpu.fill(4, 46, 16, 3, " ")
-    gpu.setBackground(0x000000)
-    gpu.setForeground(0xFFFFFF)
-    gpu.set(5, 47, " SAVE CHANGES ")
-  --update database
-  --request update
-  end
-
-  addressFile = io.open("addressbook.txt", "r")
-   
-  local record = {}
-  if mode == "m" then
-    local n = 0
-    for line in addressFile:lines() do
-      n=n+1
-      if n == lineNumber then
-        if line ~= nil then
-          for word in string.gmatch(line, "([^;]+)") do
-            if word == nil then break
-            else
-        table.insert(record, word)
-            end
-          end
-      end
-      end
-    end
-    
-    addressFile:close()
-  
-    gpu.set(17, 4, record[2])
-    gpu.set(47, 4, record[1])
-    gpu.set(78, 4, record[3])
-    gpu.set(109, 4, record[4])
-    gpu.set(140, 4, record[5])
-    gpu.set(17, 8, record[6])
-    gpu.set(52, 8, record[7])
-    
-    resultTable = wrap(record[8], 152)
-    if resultTable ~= nil then
-      for k,v in pairs(resultTable) do
-        gpu.set(5, 13+k, v)
-      end
-    end
-    
-    --click handling
-  local detRunning = true
-  while detRunning do
-    local _,_,x,y = event.pull(1, "touch")
-    if x then
-    --exit
-      if ((x<w) and (x>w-5)) and ((y<2) and (y>0)) then
-        detRunning = false
-        break
-      end 
-    end
-  end    
-  addressBook(true)
-  
-  elseif mode == "e" then
-    local n = 0
-    for line in addressFile:lines() do
-      n=n+1
-      if n == lineNumber then
-        if line ~= nil then
-          for word in string.gmatch(line, "([^;]+)") do
-            if word == nil then break
-            else
-        table.insert(record, word)
-            end
-          end
-      end
-      end
-    end
-
-    addressFile:close()   
-  
-    gpu.set(17, 4, record[2])
-    gpu.set(47, 4, record[1])
-    gpu.set(78, 4, record[3])
-    gpu.set(109, 4, record[4])
-    gpu.set(140, 4, record[5])
-    gpu.set(17, 8, record[6])
-    gpu.set(52, 8, record[7])
-  
-  --num;address;code;name;category;galaxy;description;info
-  local number = record[1]
-  local address = record[2]
-  local code = record[3]
-  local name = record[4]
-  local category = record[5]
-  local galaxy = record[6]
-  local description = record[7]
-  local info = record[8]
-    
-    resultTable = wrap(record[8], 152)
-    if resultTable ~= nil then
-      for k,v in pairs(resultTable) do
-        gpu.set(5, 13+k, v)
-      end
-    end
-  
-  --click handling
-  local detRunning = true
-  while detRunning do
-    local _,_,x,y = event.pull(1, "touch")
-    if x then
-    --exit
-      if ((x<w) and (x>w-5)) and ((y<2) and (y>0)) then
-        detRunning = false
-        break
-      end
-    --address 
-      if ((x<32) and (x>15)) and ((y<5) and (y>3)) then
-        gpu.fill(16, 4, 17, 1, " ") 
-          local typing = true
-          local type = true
-          local symbol
-          local address = ""
-          local index = 0
-          while typing and index<=11 do
-            gpu.set(16+index+1, 4, "_")
-            local _,_,key = event.pull("key_down")
-            index = index + 1
-            if (key == 8) and (index > 1) then --backspace
-            index = index - 1
-            address = string.sub(address, 1, index+1)
-              gpu.set(16+index+1, 4, " ")
-            gpu.set(16+index, 4, "_")
-            index=index-1
-            elseif index >= 1 then
-              if ((key>47) and (key<58)) then
-                symbol = numbers[key-47]
-              end
-              if ((key>96) and (key<123)) then
-                symbol = characters[key-96]
-              end
-              if type then
-                gpu.set(16+index, 4, symbol)
-              end
-              if index==4 then
-                index = index + 1
-                gpu.set(16+index, 4, "-")
-              end
-              if index==8 then
-                index = index + 1
-                gpu.set(16+index, 4, "-")
-              end
-              if index==11 then
-                type = false
-                gpu.set(17+index, 4, "_")
-                for i=1,11 do
-                  symbol = gpu.get(16+i, 4)
-                  if symbol == "-" then
-                  else
-                    address = address..symbol
-                  end
-                end
-                while true do
-                  local _,_,key = event.pull("key_down")
-                  if key == 13 then
-                    gpu.set(17+index, 4, " ") 
-                    typing = false
-                    break
-                  end
-                end
-              end
-            end 
-          end
-        end
-      --number
-        if ((x<65) and (x>45)) and ((y<5) and (y>3)) then
-          gpu.fill(46, 4, 18, 1, " ")
-          number = textField(46, 4, 16, 1)
-        end
-    --code
-      if ((x<96) and (x>76)) and ((y<5) and (y>3)) then
-          gpu.fill(77, 4, 18, 1, " ")
-      code = textField(77, 4, 16, 1)
-        end
-    --name
-      if ((x<127) and (x>107)) and ((y<5) and (y>3)) then
-          gpu.fill(108, 4, 18, 1, " ")
-      name = textField(108, 4, 16, 1)
-        end
-    --category
-      if ((x<158) and (x>138)) and ((y<5) and (y>3)) then
-          gpu.fill(139, 4, 18, 1, " ")
-      category = textField(139, 4, 16, 1)
-        end
-    --galaxy
-      if ((x<32) and (x>15)) and ((y<9) and (y>7)) then
-          gpu.fill(16, 8, 17, 1, " ")
-      galaxy = textField(16, 8, 16, 1)
-        end
-    --description
-      if ((x<158) and (x>50)) and ((y<9) and (y>7)) then
-        gpu.fill(51, 8, 106, 1, " ")
-      description = textField(51, 8, 107, 1)
-        end
-    --info
-      if ((x<158) and (x>4)) and ((y<44) and (y>13)) then
-        gpu.fill(5, 14, 152, 30, " ")
-      info = textField(5, 14, 153, 35)
-      end
-      --save
-      if ((x<20) and (x>4)) and ((y<48) and (y>45)) then
-        --num;address;code;name;category;galaxy;description;info
-          local hFile = io.open("addressbook.txt", "r")
-      local lines = {}
-      local restOfFile
-      local lineCt = 1
-      for line in hFile:lines() do
-        if(lineCt == lineNumber) then
-        lines[#lines + 1] = number..";"..address..";"..code..";"..name..";"..category..";"..galaxy..";"..description..";"..info.."\n"
-        restOfFile = hFile:read("*a")
-        break
-        else
-        lineCt = lineCt + 1
-        lines[#lines + 1] = line
-        end
-      end
-      hFile:close()
-
-      hFile = io.open("addressbook.txt", "w") --write the file.
-      for i, line in ipairs(lines) do
-        hFile:write(line, "\n")
-      end
-      hFile:write(restOfFile)
-      hFile:close()
-      end
-    end
-  end
-  
-  elseif mode == "a" then
-    --num;address;code;name;category;galaxy;description;info
-  local number = " "
-  local address = " "
-  local code = " "
-  local name = " "
-  local category = " "
-  local galaxy = " "
-  local description = " "
-  local info = " "   
-  
-    --click handling
-  local detRunning = true
-  while detRunning do
-    local _,_,x,y = event.pull(1, "touch")
-    if x then
-    --exit
-      if ((x<w) and (x>w-5)) and ((y<2) and (y>0)) then
-        detRunning = false
-        break
-      end
-    --address 
-      if ((x<32) and (x>15)) and ((y<5) and (y>3)) then 
-          local typing = true
-          local type = true
-          local symbol
-      address = ""
-          local index = 0
-          while typing and index<=11 do
-            gpu.set(16+index+1, 4, "_")
-            local _,_,key = event.pull("key_down")
-            index = index + 1
-            if (key == 8) and (index > 1) then --backspace
-            index = index - 1
-            address = string.sub(address, 1, index+1)
-              gpu.set(16+index+1, 4, " ")
-            gpu.set(16+index, 4, "_")
-            index=index-1
-            elseif index >= 1 then
-              if ((key>47) and (key<58)) then
-                symbol = numbers[key-47]
-              end
-              if ((key>96) and (key<123)) then
-                symbol = characters[key-96]
-              end
-              if type then
-                gpu.set(16+index, 4, symbol)
-              end
-              if index==4 then
-                index = index + 1
-                gpu.set(16+index, 4, "-")
-              end
-              if index==8 then
-                index = index + 1
-                gpu.set(16+index, 4, "-")
-              end
-              if index==11 then
-                type = false
-                gpu.set(17+index, 4, "_")
-                for i=1,11 do
-                  symbol = gpu.get(16+i, 4)
-                  if symbol == "-" then
-            address = address.."-"
-                  else
-                    address = address..symbol
-                  end
-                end
-                while true do
-                  local _,_,key = event.pull("key_down")
-                  if key == 13 then
-                    gpu.set(17+index, 4, " ") 
-                    typing = false
-                    break
-                  end
-                end
-              end
-            end 
-          end
-        end
-      --number
-        if ((x<65) and (x>45)) and ((y<5) and (y>3)) then
-          gpu.fill(46, 4, 18, 1, " ")
-          number = textField(46, 4, 16, 1)
-        end
-    --code
-      if ((x<96) and (x>76)) and ((y<5) and (y>3)) then
-          gpu.fill(77, 4, 18, 1, " ")
-      code = textField(77, 4, 16, 1)
-        end
-    --name
-      if ((x<127) and (x>107)) and ((y<5) and (y>3)) then
-          gpu.fill(108, 4, 18, 1, " ")
-      name = textField(108, 4, 16, 1)
-        end
-    --category
-      if ((x<158) and (x>138)) and ((y<5) and (y>3)) then
-          gpu.fill(139, 4, 18, 1, " ")
-      category = textField(139, 4, 16, 1)
-        end
-    --galaxy
-      if ((x<32) and (x>15)) and ((y<9) and (y>7)) then
-          gpu.fill(16, 8, 17, 1, " ")
-      galaxy = textField(16, 8, 16, 1)
-        end
-    --description
-      if ((x<158) and (x>50)) and ((y<9) and (y>7)) then
-        gpu.fill(51, 8, 106, 1, " ")
-      description = textField(51, 8, 107, 1)
-        end
-    --info
-      if ((x<158) and (x>4)) and ((y<44) and (y>13)) then
-        gpu.fill(5, 14, 152, 30, " ")
-      info = textField(5, 14, 153, 35)
-      end
-      --save
-      if ((x<20) and (x>4)) and ((y<48) and (y>45)) then
-        --num;address;code;name;category;galaxy;description;info
-          addressFile = io.open("addressbook.txt", "a")
-        data = "\n"..number..";"..address..";"..code..";"..name..";"..category..";"..galaxy..";"..description..";"..info
-        addressFile:write(data)
-          addressFile:close()
-      end
-    end
-  end
-  end
-  addressBook(true)
-  --resetGUI()
-end
-]]
-
-function drawAddressBookBorders()
-  gpu.setBackground(0x339D8F)
-  gpu.fill(1, 1, w, 1, " ")
-  gpu.fill(1, 1, 1, h-2, " ")
-  gpu.fill(1, h, w, h, " ")
-  gpu.fill(w, 3, w-1, h, " ")
-  
-  gpu.setBackground(0xCC0000)
-  gpu.setForeground(0xFFFFFF)
-  gpu.fill(w-5, 1, 5, 1, " ")
-  gpu.set(w-3, 1, "X")
-end
-
-function addressBook()
+function addressBook(override)
   gpu.fill(1, 1, w, h, " ")
   drawAddressBookBorders()
   
@@ -1138,7 +699,7 @@ function addressBook()
       --numLines = numLines + 1
       --print(iter..tablelength(locations))
       
-      if (locations[iter] == "L31RE90P0") then
+      if (locations[iter] ~= "L31RE90P0") then
         index = index + 1
         gpu.setBackground(0x339D8F)
         gpu.fill(4, 3+index*7, w-10, 1, " ")
@@ -1201,7 +762,7 @@ function addressBook()
       end
     end
   
-    --if override then return nil end
+    if override then return nil end
   
   --click handling
     local clicking = true
@@ -1251,6 +812,7 @@ function addressBook()
 
   resetGUI()
 end
+
 
 resetGUI()
 
@@ -1507,52 +1069,6 @@ while running do
   --click handling
   local _,_,x,y = event.pull(1, "touch")
   if x then
-    --exit
-    if ((x<w) and (x>w-5)) and ((y<2) and (y>0)) then
-      running = false
-    end
-
-    --iris
-    if ((x<10) and (x>4)) and ((y<6) and (y>2)) then
-      if iris == "Closed" then
-        sg.openIris()
-      end
-      if iris == "Open" then
-        sg.closeIris()
-      end
-    end
-    
-    --terminating
-    if ((x<30) and (x>4)) and ((y<15) and (y>13)) then
-      ok, result = pcall(sg.disconnect, address)
-      if ok then
-        gpu.setBackground(0x000000)
-        gpu.fill(100, 13, 2, 1, " ")
-        gpu.set(136, 10, " ")
-        gpu.fill(108, 23, 2, 1, " ")
-        gpu.set(136, 16, " ")
-        gpu.fill(104, 31, 2, 1, " ")
-        gpu.set(136, 22, " ")
-        gpu.fill(56, 31, 2, 1, " ")
-        gpu.set(136, 28, " ")
-        gpu.fill(52, 23, 2, 1, " ")
-        gpu.set(136, 34, " ")
-        gpu.fill(60, 13, 2, 1, " ")
-        gpu.set(136, 40, " ")
-        gpu.fill(80, 9, 2, 1, " ")
-        gpu.set(136, 46, " ")
-        gpu.fill(90, 36, 2, 1, " ")
-        gpu.set(136, 52, " ")
-        gpu.fill(70, 36, 2, 1, " ")
-        gpu.set(136, 58, " ")
-      else
-        gpu.fill(5, 36, 26, 12, " ")
-        resultTable = wrap(result, 26)
-        for k,v in pairs(resultTable) do
-          gpu.set(5, 35+k, v)
-        end
-      end
-    end
     
     --address book
     if ((x<30) and (x>4)) and ((y<29) and (y>27)) then
@@ -1585,7 +1101,9 @@ while running do
               symbol = characters[key-96]
             end
             if type then
-              gpu.set(11+index, 10, symbol)
+              if symbol ~= null then
+                gpu.set(11+index, 10, symbol)
+              end
             end
             if index==4 then
               index = index + 1
