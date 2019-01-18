@@ -56,7 +56,7 @@ function install()
   local files = remoteCfg.StargateControl.files
   
   -- create src folder
-  if not fs.exists("./src") then
+  if not fs.exists("./src/") then
     fs.makeDirectory("./src")
   end
   
