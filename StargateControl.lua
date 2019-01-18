@@ -54,6 +54,12 @@ end
 
 function install()
   local files = remoteCfg.StargateControl.files
+  
+  -- create src folder
+  if not fs.exists("./src" then
+    fs.makeDirectory("./src")
+  end
+  
   for remoteFileName, localFileName in pairs(files) do
     print(remoteFileName, localFileName)
     local result, response = pcall(internet.request, url .. remoteFileName)
