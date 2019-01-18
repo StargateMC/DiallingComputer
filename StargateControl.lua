@@ -91,7 +91,7 @@ if not programsFile and reason ~= "file not found" then
   return
 elseif reason == "file not found" then
   -- fresh install
-  io.write("programs.cfg file not found, installing")
+  io.write("Missing programs.cfg, installing ...\n")
   if not install() then
     return
   end
@@ -103,13 +103,13 @@ else
   local versionLocal = cfgLocal.StargateControl.note
   if versionLocal == nil or not ok then
     -- programs.cfg malformed, reinstall
-    io.write("programs.cfg file is malformed, reinstalling")
+    io.write("Malformed programs.cfg, reinstalling ...\n")
     if not install() then
       return
     end
   elseif versionLocal ~= remoteCfg.StargateControl.note then
     -- update required
-    io.write("updating ...")
+    io.write("New version detected, updating ...\n")
     if not install() then
       return
     end
