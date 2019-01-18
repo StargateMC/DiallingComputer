@@ -1,5 +1,6 @@
 local component = require("component")
 local shell = require("shell")
+local fs = require("filesystem")
 
 if not component.isAvailable("gpu") then
   io.stderr:write("GPU not found\n")
@@ -32,10 +33,10 @@ local function deserialize(data, opts)
 end
 
 local internet = require("internet")
-local url = "https://raw.githubusercontent.com/OneDayStudios/DiallingComputer/master/"
+local url = "https://raw.githubusercontent.com/OneDayStudios/DiallingComputer/"
 
 local function loadRemoteConfig()
-  local result, response = pcall(internet.request, url .. "programs.cfg")
+  local result, response = pcall(internet.request, url .. "master/programs.cfg")
   if not result then
     -- HTTP error, terminate
     io.stderr:write("Failed to load remote config: " .. response .. "\n")
@@ -53,15 +54,30 @@ end
 
 function install()
   local files = remoteCfg.StargateControl.files
-  for k, v in pairs(files) do
-    print(k, v)
-    local result, response = pcall(internet.request, url .. k)
+  for remoteFileName, localFileName in pairs(files) do
+    print(remoteFileName, localFileName)
+    local result, response = pcall(internet.request, url .. remoteFileName)
     if not result then
       -- HTTP error, terminate
-      io.stderr:write("Failed to load remote file: " .. k .. "\n" .. response .. "\n")
+      io.stderr:write("Failed to load remote file: " .. remoteFileName .. "\n" .. response .. "\n")
       return false
     else
-      io.write(response())
+      -- remove old
+      if fs.exists(localFileName) then
+        fs.remove(localFileName)
+      end
+      
+      -- download new
+      local f, reason = io.open(localFileName, "w")
+      if not f then
+        io.stderr:write("Failed to open file: " .. localFileName .. "\n" .. reason .. "\n")
+        return
+      end
+      for chunk in response do
+        f:write(chunk)
+      end
+      f:close()
+      
     end
   end
 end
@@ -74,6 +90,7 @@ if not programsFile and reason ~= "file not found" then
   return
 elseif reason == "file not found" then
   -- fresh install
+  io.write("programs.cfg file not found, installing")
   if not install() then
     return
   end
@@ -85,19 +102,18 @@ else
   local versionLocal = cfgLocal.StargateControl.note
   if versionLocal == nil or not ok then
     -- programs.cfg malformed, reinstall
+    io.write("programs.cfg file is malformed, reinstalling")
     if not install() then
       return
     end
   elseif versionLocal ~= remoteCfg.StargateControl.note then
     -- update required
+    io.write("updating ...")
     if not install() then
       return
     end
   end
 end
 
-if not install() then
-  return
-end
 local app = require("src/app")
---app.run()
+app.run()
