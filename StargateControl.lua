@@ -77,9 +77,10 @@ function install()
         f:write(chunk)
       end
       f:close()
-      
     end
   end
+  
+  return true
 end
 
 -- check version and update/install
