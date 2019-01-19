@@ -25,8 +25,10 @@ GREY_LIGHT =    0xA0A0A0  -- disabled controls foreground
 local graphics = require("src/graphics")
 local Button = require("src/Button")
 local AddressField = require("src/AddressField")
+local IDCField = require("src/IDCField")
 
 local stargate = component.stargate
+local gpu = component.gpu
 
 -- draw static graphics
 graphics.draw()
@@ -42,7 +44,7 @@ end
 updateExitBtn()
 
 -- iris button
-local irisBtn = Button.new(4, 3, 34, 3, "IRIS", CYAN, TEXT_WHITE)
+local irisBtn = Button.new(4, 3, 16, 3, "IRIS", CYAN, TEXT_WHITE)
 function updateIrisBtn()
   irisBtn:setBackground(CYAN)
   local irisState = stargate.irisState()
@@ -59,6 +61,26 @@ function updateIrisBtn()
 end
 updateIrisBtn()
 
+-- iris auto close button
+local autoClose = false
+local autoCloseBtn = Button.new(22, 3, 16, 3, "AUTOCLOSE: OFF", CYAN, TEXT_WHITE)
+function updateAutoCloseBtn()
+  if autoClose then
+    autoCloseBtn:setLabel("AUTOCLOSE: ON")
+    autoCloseBtn:setBackground(CYAN_LIGHT)
+  else
+    autoCloseBtn:setLabel("AUTOCLOSE: OFF")
+    autoCloseBtn:setBackground(CYAN)
+  end
+  local irisState = stargate.irisState()
+  if irisState == "Offline" then
+    autoCloseBtn:lock()
+  else
+    autoCloseBtn:unlock()
+  end
+end
+updateAutoCloseBtn()
+
 -- terminate connection button
 local terminateBtn = Button.new(4, 7, 34, 3, "TERMINATE CONNECTION", RED_DARK, TEXT_WHITE)
 function updateTerminateBtn()
@@ -73,11 +95,11 @@ end
 updateTerminateBtn()
 
 -- address field
-local addressFld = AddressField.new(4, 11, 34, 5, "ENTER ADDRESS", CYAN, TEXT_WHITE, BACKGROUND)
+local addressFld = AddressField.new(4, 11+1, 34, 5, "ENTER ADDRESS", CYAN, TEXT_WHITE, BACKGROUND)
 addressFld:draw()
 
 -- dial button
-local dialBtn = Button.new(4, 17, 34, 3, "DIAL", CYAN, TEXT_WHITE)
+local dialBtn = Button.new(4, 17+1, 34, 3, "DIAL", CYAN, TEXT_WHITE)
 function updateDialBtn()
   dialBtn:setBackground(CYAN)
   local gateState, _, _ = stargate.stargateState()
@@ -89,7 +111,15 @@ function updateDialBtn()
 end
 updateDialBtn()
 
+-- configuration button
+local configBtn = Button.new(4, 43+3, 34, 3, "GDO CONFIGURATION", CYAN, TEXT_WHITE)
+configBtn:draw()
+
+-- IDC field
+local idcField = IDCField.new(61, 14, 40, 22, "VALID IDCS", CYAN, TEXT_WHITE, BACKGROUND, stargate.getValidIDCs())
+
 -- main loop
+local prevState = "Idle"
 local run = true
 while run do
   -- update gate and iris state
@@ -113,12 +143,6 @@ while run do
       graphics.emptyGate()
     end
   
-  elseif gateState == "Closing" then
-    -- clear chevrons
-    for i = 1, 9 do
-      graphics.drawChevron(i, " ", BACKGROUND)
-    end
-    
   elseif gateState == "Connected" then
     if irisState == "Closed" then
       -- wormhole is connected, but iris is closed
@@ -128,6 +152,11 @@ while run do
       graphics.drawWormhole()
     end
   else
+    -- clear chevrons
+    for i = 1, 9 do
+      graphics.drawChevron(i, " ", BACKGROUND)
+    end
+    
     if irisState == "Closed" then
       -- iris is closed
       graphics.drawIris()
@@ -141,8 +170,8 @@ while run do
   local _, _, x, y = event.pull(1, "touch")
   
   -- update control elements
-  graphics.drawRemoteInfo(addressFld.address, stargate.energyToDial(addressFld.address))
-  graphics.drawLocalGateInfo(stargate.localAddress(), stargate.energyAvailable(), irisState)
+  graphics.drawRemoteInfo(4, 21+2, addressFld.address, stargate.energyToDial(addressFld.address))
+  graphics.drawLocalGateInfo(4, 31+2, stargate.localAddress(), stargate.energyAvailable(), irisState)
   
   -- exit button
   updateExitBtn()
@@ -162,6 +191,15 @@ while run do
       irisBtn:setLabel("OPEN IRIS")
       stargate.closeIris()
     end
+  end
+  
+  -- iris autoclose button
+  updateAutoCloseBtn()
+  if autoCloseBtn:clicked(x, y) then
+    autoClose = not autoClose
+  end
+  if autoClose and gateState == "Connected" and direction == "Incoming" and prevState == "Dialling" then
+    stargate.closeIris()
   end
   
   -- terminate button
@@ -193,6 +231,37 @@ while run do
       stargate.dial(addressFld.address)
     end
   end
+  
+  -- config button
+  if configBtn:clicked(x, y) then
+    configBtn:setBackground(CYAN_LIGHT)
+    
+    -- open IDC window
+    idcField:draw()
+    idcField:readInput()
+    
+    -- close IDC window
+    idcField:hide()
+    graphics.drawGate()
+    configBtn:setBackground(CYAN)
+    
+    -- remove existing stargate IDCs
+    for k, v in pairs(stargate.getValidIDCs()) do
+      if k ~= "n" then
+        stargate.removeIDC(v)
+      end
+    end
+    -- add new IDCs
+    for k, v in pairs(idcField.idcs) do
+      if k ~= "n" then
+        stargate.addIDC(v)
+      end
+    end
+    idcField.idcs = stargate.getValidIDCs()
+  end
+  
+  -- save current gate state
+  prevState = gateState
   
 end
 

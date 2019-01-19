@@ -12,8 +12,8 @@ function graphics.draw()
   graphics.drawGate()
   graphics.drawGateControls()
   graphics.drawStatusWindow()
-  graphics.drawRemoteInfo()
-  graphics.drawLocalGateInfo()
+  graphics.drawRemoteInfo(4, 21+2)
+  graphics.drawLocalGateInfo(4, 31+2)
 end
 
 function graphics.drawBorders()
@@ -469,55 +469,55 @@ function graphics.drawStateMsg(state, direction)
   end
 end
 
-function graphics.drawRemoteInfo(address, energy)
+function graphics.drawRemoteInfo(x, y, address, energy)
   gpu.setBackground(CYAN)
-  gpu.fill(4, 21, 34, 9, " ")
+  gpu.fill(x, y, 34, 9, " ")
   gpu.setBackground(BACKGROUND)
-  gpu.fill(5, 24, 32, 5, " ")
+  gpu.fill(x+1, y+3, 32, 5, " ")
   gpu.setBackground(CYAN)
   gpu.setForeground(TEXT_WHITE)
-  gpu.set(4 + 17 - string.len("REMOTE GATE DATA")/2, 22, "REMOTE GATE DATA")
+  gpu.set(x + 17 - string.len("REMOTE GATE DATA")/2, y+1, "REMOTE GATE DATA")
   gpu.setBackground(BACKGROUND)
   if address == nil or string.len(address) < 7 then
-    gpu.set(6, 25, "ADDRESS: INVALID")
+    gpu.set(x+2, y+4, "ADDRESS: INVALID")
   else
-    gpu.set(6, 25, "ADDRESS: " .. address)
+    gpu.set(x+2, y+4, "ADDRESS: " .. address)
   end
   
   if energy == nil then
-    gpu.set(6, 27, "ENERGY TO DIAL: N/A")
+    gpu.set(x+2, y+6, "ENERGY TO DIAL: N/A")
   else
-    gpu.set(6, 27, "ENERGY TO DIAL: " .. math.floor(energy + 0.5))
+    gpu.set(x+2, y+6, "ENERGY TO DIAL: " .. math.floor(energy + 0.5))
   end
   
 end
 
-function graphics.drawLocalGateInfo(address, energy, iris)
+function graphics.drawLocalGateInfo(x, y, address, energy, iris)
   gpu.setBackground(CYAN)
-  gpu.fill(4, 31, 34, 11, " ")
+  gpu.fill(x, y, 34, 11, " ")
   gpu.setBackground(BACKGROUND)
-  gpu.fill(5, 34, 32, 7, " ")
+  gpu.fill(x+1, y+3, 32, 7, " ")
   gpu.setBackground(CYAN)
   gpu.setForeground(TEXT_WHITE)
-  gpu.set(4 + 17 - string.len("LOCAL GATE DATA")/2, 32, "LOCAL GATE DATA")
+  gpu.set(x + 17 - string.len("LOCAL GATE DATA")/2, y+1, "LOCAL GATE DATA")
   gpu.setBackground(BACKGROUND)
   
   if address == nil then
-    gpu.set(6, 35, "ADDRESS: UNKNOWN")
+    gpu.set(x+2, y+4, "ADDRESS: UNKNOWN")
   else
-    gpu.set(6, 35, "ADDRESS: " .. address)
+    gpu.set(x+2, y+4, "ADDRESS: " .. address)
   end
   
   if energy == nil then
-    gpu.set(6, 37, "AVAILABLE ENERGY: N/A")
+    gpu.set(x+2, y+6, "AVAILABLE ENERGY: N/A")
   else
-    gpu.set(6, 37, "AVAILABLE ENERGY: " .. math.floor(energy + 0.5))
+    gpu.set(x+2, y+6, "AVAILABLE ENERGY: " .. math.floor(energy + 0.5))
   end
   
   if iris == nil then
-    gpu.set(6, 39, "IRIS STATE: UNKNOWN")
+    gpu.set(x+2, y+8, "IRIS STATE: UNKNOWN")
   else
-    gpu.set(6, 39, "IRIS STATE: " .. iris)
+    gpu.set(x+2, y+8, "IRIS STATE: " .. iris)
   end
 end
 
