@@ -21,6 +21,7 @@ BLUE_DARK =     0x2B586B  -- iris
 BLUE =          0x2866A6  -- wormhole
 GREY =          0x505050  -- disabled controls background
 GREY_LIGHT =    0xA0A0A0  -- disabled controls foreground
+GREEN =         0x2F8C45  -- no error
 
 local graphics = require("src/graphics")
 local Button = require("src/Button")
@@ -81,25 +82,12 @@ function updateAutoCloseBtn()
 end
 updateAutoCloseBtn()
 
--- terminate connection button
-local terminateBtn = Button.new(4, 7, 34, 3, "TERMINATE CONNECTION", RED_DARK, TEXT_WHITE)
-function updateTerminateBtn()
-  terminateBtn:setBackground(RED_DARK)
-  local gateState, _, direction = stargate.stargateState()
-  if not ((gateState == "Connected" and direction == "Outgoing") or gateState == "Dialling") then
-    terminateBtn:lock()
-  else
-    terminateBtn:unlock()
-  end
-end
-updateTerminateBtn()
-
 -- address field
-local addressFld = AddressField.new(4, 11+1, 34, 5, "ENTER ADDRESS", CYAN, TEXT_WHITE, BACKGROUND)
+local addressFld = AddressField.new(4, 7, 34, 5, "ENTER ADDRESS", CYAN, TEXT_WHITE, BACKGROUND)
 addressFld:draw()
 
 -- dial button
-local dialBtn = Button.new(4, 17+1, 34, 3, "DIAL", CYAN, TEXT_WHITE)
+local dialBtn = Button.new(4, 13, 16, 3, "DIAL", CYAN, TEXT_WHITE)
 function updateDialBtn()
   dialBtn:setBackground(CYAN)
   local gateState, _, _ = stargate.stargateState()
@@ -111,6 +99,19 @@ function updateDialBtn()
 end
 updateDialBtn()
 
+-- terminate connection button
+local terminateBtn = Button.new(22, 13, 16, 3, "TERMINATE", RED_DARK, TEXT_WHITE)
+function updateTerminateBtn()
+  terminateBtn:setBackground(RED_DARK)
+  local gateState, _, direction = stargate.stargateState()
+  if not ((gateState == "Connected" and direction == "Outgoing") or gateState == "Dialling") then
+    terminateBtn:lock()
+  else
+    terminateBtn:unlock()
+  end
+end
+updateTerminateBtn()
+
 -- configuration button
 local configBtn = Button.new(4, 43+3, 34, 3, "GDO CONFIGURATION", CYAN, TEXT_WHITE)
 configBtn:draw()
@@ -120,6 +121,7 @@ local idcField = IDCField.new(61, 14, 40, 22, "VALID IDCS", CYAN, TEXT_WHITE, BA
 
 -- main loop
 local prevState = "Idle"
+local lastErr = nil
 local run = true
 while run do
   -- update gate and iris state
@@ -170,8 +172,8 @@ while run do
   local _, _, x, y = event.pull(1, "touch")
   
   -- update control elements
-  graphics.drawRemoteInfo(4, 21+2, addressFld.address, stargate.energyToDial(addressFld.address))
-  graphics.drawLocalGateInfo(4, 31+2, stargate.localAddress(), stargate.energyAvailable(), irisState)
+  graphics.drawRemoteInfo(4, 17, addressFld.address, stargate.energyToDial(addressFld.address))
+  graphics.drawLocalGateInfo(4, 27, stargate.localAddress(), stargate.energyAvailable(), irisState, lastErr)
   
   -- exit button
   updateExitBtn()
@@ -228,7 +230,7 @@ while run do
   if dialBtn:clicked(x, y) then
     dialBtn:setBackground(CYAN_LIGHT)
     if string.len(addressFld.address) >= 7 then
-      stargate.dial(addressFld.address)
+      _, lastErr = stargate.dial(addressFld.address)
     end
   end
   
