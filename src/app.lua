@@ -172,7 +172,7 @@ while run do
   local _, _, x, y = event.pull(1, "touch")
   
   -- update control elements
-  graphics.drawRemoteInfo(4, 17, addressFld.address, stargate.energyToDial(addressFld.address))
+  graphics.drawRemoteInfo(4, 17, addressFld.address, "Unavailable")
   graphics.drawLocalGateInfo(4, 27, stargate.localAddress(), stargate.energyAvailable(), irisState, lastErr)
   
   -- exit button
