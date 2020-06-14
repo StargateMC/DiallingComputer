@@ -33,7 +33,7 @@ local function deserialize(data, opts)
 end
 
 local internet = require("internet")
-local url = "https://raw.githubusercontent.com/OneDayStudios/DiallingComputer/"
+local url = "https://raw.githubusercontent.com/StargateMC/DiallingComputer/"
 
 local function loadRemoteConfig()
   local result, response = pcall(internet.request, url .. "master/programs.cfg")
