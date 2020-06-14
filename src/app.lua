@@ -26,7 +26,6 @@ GREEN =         0x2F8C45  -- no error
 local graphics = require("src/graphics")
 local Button = require("src/Button")
 local AddressField = require("src/AddressField")
-local IDCField = require("src/IDCField")
 
 local stargate = component.stargate
 local gpu = component.gpu
@@ -113,11 +112,8 @@ end
 updateTerminateBtn()
 
 -- configuration button
-local configBtn = Button.new(4, 43+3, 34, 3, "GDO CONFIGURATION", CYAN, TEXT_WHITE)
+local configBtn = Button.new(4, 43+3, 34, 3, "GDO CONFIGURATION (Disabled)", CYAN, TEXT_WHITE)
 configBtn:draw()
-
--- IDC field
-local idcField = IDCField.new(61, 14, 40, 22, "VALID IDCS", CYAN, TEXT_WHITE, BACKGROUND, stargate.getValidIDCs())
 
 -- main loop
 local prevState = "Idle"
@@ -234,33 +230,6 @@ while run do
     end
   end
   
-  -- config button
-  if configBtn:clicked(x, y) then
-    configBtn:setBackground(CYAN_LIGHT)
-    
-    -- open IDC window
-    idcField:draw()
-    idcField:readInput()
-    
-    -- close IDC window
-    idcField:hide()
-    graphics.drawGate()
-    configBtn:setBackground(CYAN)
-    
-    -- remove existing stargate IDCs
-    for k, v in pairs(stargate.getValidIDCs()) do
-      if k ~= "n" then
-        stargate.removeIDC(v)
-      end
-    end
-    -- add new IDCs
-    for k, v in pairs(idcField.idcs) do
-      if k ~= "n" then
-        stargate.addIDC(v)
-      end
-    end
-    idcField.idcs = stargate.getValidIDCs()
-  end
   
   -- save current gate state
   prevState = gateState
