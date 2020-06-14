@@ -111,9 +111,6 @@ function updateTerminateBtn()
 end
 updateTerminateBtn()
 
--- configuration button
-local configBtn = Button.new(4, 43+3, 34, 3, "GDO CONFIGURATION (Disabled)", CYAN, TEXT_WHITE)
-configBtn:draw()
 
 -- main loop
 local prevState = "Idle"
